@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  appium-tests:
+    build: .
+    container_name: appium-mercadolibre-tests
+    privileged: true
+    environment:
+      - ANDROID_HOME=/opt/android-sdk
+      - ANDROID_SDK_ROOT=/opt/android-sdk
+    volumes:
+      - ./:/workspace
+      - /dev/kvm:/dev/kvm
+    working_dir: /workspace
+    command: >
+      bash -c "
+        ./scripts/start-appium.sh &
+        sleep 30 &&
+        bundle exec cucumber features/search.feature
+      "
+    
+  appium-server:
+    build: .
+    container_name: appium-server
+    privileged: true
+    environment:
+      - ANDROID_HOME=/opt/android-sdk
+      - ANDROID_SDK_ROOT=/opt/android-sdk
+    volumes:
+      - ./:/workspace
+      - /dev/kvm:/dev/kvm
+    ports:
+      - "4723:4723"
+    working_dir: /workspace
+    command: ["./scripts/start-appium.sh"]
